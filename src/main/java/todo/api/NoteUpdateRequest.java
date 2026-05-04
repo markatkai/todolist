@@ -1,7 +1,8 @@
 package todo.api;
 
 public record NoteUpdateRequest(
-    String noteText
+    String text,
+    NoteStatus status
 ) {
 
 }
