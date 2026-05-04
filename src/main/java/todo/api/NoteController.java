@@ -3,6 +3,7 @@ package todo.api;
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,8 +13,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import todo.data.NoteDao;
+
 @RestController
 public class NoteController {
+
+    private NoteDao noteDao;
+
+    @Autowired
+    public NoteController(NoteDao noteDao) {
+        this.noteDao = noteDao;
+    }
 
     /**
      * Find notes created between times.
@@ -35,8 +45,7 @@ public class NoteController {
      */
     @PostMapping("/notes")
     NoteResponse createNotes(@RequestBody NoteCreateRequest request) {
-        // TODO
-        return null;
+        return noteDao.create(request.text());
     }
 
     /**
@@ -48,8 +57,7 @@ public class NoteController {
     @PutMapping("/notes/{id}")
     NoteResponse updateNotes(@PathVariable Long id, 
         @RequestBody NoteUpdateRequest request) {
-        // TODO
-        return null;
+        return noteDao.update(id, request.text(), request.status());
     }
 
     /**
@@ -58,6 +66,6 @@ public class NoteController {
      */
     @DeleteMapping("/notes/{id}")
     void deleteNote(@PathVariable Long id) {
-        // TODO
+        noteDao.delete(id);
     }
 }
