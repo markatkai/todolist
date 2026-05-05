@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  todoback:
+    container_name: todoback
+    build: ../server
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      TODO_DB_HOST: "tododb"
+      TODO_DB_USER: "todo"
+      TODO_DB_PASSWORD: "todopassword"
+
+  todoapp:
+    container_name: todoapp
+    build: ../todoapp
+    ports:
+      - "80:80"
+    restart: always
+    depends_on: 
+      - todoback
+

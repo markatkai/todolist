@@ -1,5 +1,6 @@
 services:
   tododb:
+    container_name: tododb
     image: postgres:18.3-trixie
     restart: unless-stopped
     environment:
