@@ -13,16 +13,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import todo.data.NoteDao;
+import todo.data.NoteService;
 
 @RestController
 public class NoteController {
 
-    private NoteDao noteDao;
+    private NoteService noteService;
 
     @Autowired
-    public NoteController(NoteDao noteDao) {
-        this.noteDao = noteDao;
+    public NoteController(NoteService noteService) {
+        this.noteService = noteService;
     }
 
     /**
@@ -45,7 +45,7 @@ public class NoteController {
      */
     @PostMapping("/notes")
     NoteResponse createNotes(@RequestBody NoteCreateRequest request) {
-        return noteDao.create(request.text());
+        return noteService.create(request.text());
     }
 
     /**
@@ -57,7 +57,7 @@ public class NoteController {
     @PutMapping("/notes/{id}")
     NoteResponse updateNotes(@PathVariable Long id, 
         @RequestBody NoteUpdateRequest request) {
-        return noteDao.update(id, request.text(), request.status());
+        return noteService.updateByIId(id, request.text(), request.status());
     }
 
     /**
@@ -66,6 +66,6 @@ public class NoteController {
      */
     @DeleteMapping("/notes/{id}")
     void deleteNote(@PathVariable Long id) {
-        noteDao.delete(id);
+        noteService.deleteById(id);
     }
 }
