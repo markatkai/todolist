@@ -5,21 +5,10 @@ import type { TodoItem } from "../types/TodoItem"
 import { Button } from './Button';
 
 /**
- * 
+ * Field and button for adding new todo-items to the list.
  */
-function TodoAddButton() {
+function NewTodoItem() {
     const [text, setText] = useState("");
-    const [isOpen, setIsOpen] = useState(false);
-
-
-    const togglePopup = () => {
-        console.log("BUTTON WAS PRESSED")
-        setIsOpen(true)
-    }
-    const hidePopup = () => {
-        console.log("BUTTON2 WAS PRESSED")
-        setIsOpen(false)
-    }
 
     const printText = (event: React.ChangeEvent<HTMLInputElement>) => {
         console.log(event.currentTarget.value);
@@ -41,32 +30,67 @@ function TodoAddButton() {
     }
 
     return (
-        <div>
+        <div id='todo_new_item'>
             <input onChange={printText} />
             <Button title="ADD" buttonOnClick={createTodo} />
-            {!isOpen && <Button title="Add todo-item" buttonOnClick={togglePopup}/>}
-            {isOpen && <Button title="Close" buttonOnClick={hidePopup}/>}
         </div>
     );
 }
 
 
 /**
- * 
+ * List of currently existing todo-items
  * @returns 
  */
-function TodoListList() {
+function TodoItemList() {
     const [notes, setNotes] = useState<TodoItem[]>([]);
+    const [doneNotes, setDoneNotes] = useState<TodoItem[]>([]);
 
     useEffect(() => {
-        axios.get<TodoItem[]>("/api/notes").then(res => setNotes(res.data));
+        axios.get<TodoItem[]>("/api/notes?status=UNFINISHED")
+            .then(res => setNotes(res.data));
+        axios.get<TodoItem[]>("/api/notes?status=FINISHED")
+            .then(res => setDoneNotes(res.data));
     }, []);
+
+    const markAsDone = (id: number) => {
+        console.log("TASK " + id + " IS DONE!")
+        axios.put<TodoItem>("/api/notes/" + id, {
+                status: "FINISHED"
+            }).then((response) => {
+                console.log(response);
+                window.location.reload() // TODO Lazy way to do this...
+            });
+    }
+    const deleteTask = (id: number) => {
+        console.log("TASK " + id + " WILL BE DELETED!")
+        axios.delete<TodoItem>("/api/notes/" + id).then((response) => {
+                console.log(response);
+                window.location.reload() // TODO Lazy way to do this...
+            });
+    }
 
     return (
         <div>
+            <div>
+            <h1 id="header_tasks_unfinished">TODO:</h1>
             {notes.map((note, i) => (
-                <h1 key={i}>{note.text}</h1>
+                <div className="tasklist" id="todo_tasks_unfinished">
+                    <Button title="O" buttonOnClick={() => {markAsDone(note.id)}}/>
+                    <Button title="X" buttonOnClick={() => {deleteTask(note.id)}}/>
+                    {note.text}
+                </div>
             ))}
+            </div>
+            <div className="tasklist" id="todo_tasks_finished">
+            <h1 id="header_tasks_finished">Finished tasks:</h1>
+            {doneNotes.map((note, i) => (
+                <div>
+                    <Button title="X" buttonOnClick={() => {deleteTask(note.id)}}/>
+                    {note.text}
+                </div>
+            ))}
+            </div>
         </div>
     );
 }
@@ -80,8 +104,8 @@ export class TodoList extends React.Component {
         return (
             <div className="transaction-graph">
             <h1>My TODO items</h1>
-            <TodoAddButton />
-            <TodoListList />
+            <NewTodoItem />
+            <TodoItemList />
             </div>
         );
     }
