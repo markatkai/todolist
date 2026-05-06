@@ -14,25 +14,37 @@ function NewTodoItem() {
         console.log(event.currentTarget.value);
         setText(event.currentTarget.value)
     }
+
+    const sendPostRequest = (text: string) => {
+        axios.post<TodoItem>("/api/notes", {
+            text: text
+        }).then((response) => {
+            console.log(response);
+            setText("")
+            window.location.reload() // TODO Lazy way to do this...
+        });
+    }
+
     const createTodo = () => {
-        console.log("CREATE BUTTON WAS PRESSED " + text)
         if (text) {
             console.log("And it is ok to try to send it")
             // Create a new todo item
-            axios.post<TodoItem>("/api/notes", {
-                text: text
-            }).then((response) => {
-                console.log(response);
-                setText("")
-                window.location.reload() // TODO Lazy way to do this...
-            });
+            sendPostRequest(text)
+        }
+    }
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            if (text) {
+                sendPostRequest(text)
+            }
         }
     }
 
     return (
         <div id='todo_new_item'>
-            <input onChange={printText} />
-            <Button title="ADD" buttonOnClick={createTodo} />
+            <input onChange={printText} onKeyDown={handleKeyDown} />
+            <Button title="Add" buttonOnClick={createTodo} />
         </div>
     );
 }
@@ -54,30 +66,28 @@ function TodoItemList() {
     }, []);
 
     const markAsDone = (id: number) => {
-        console.log("TASK " + id + " IS DONE!")
         axios.put<TodoItem>("/api/notes/" + id, {
-                status: "FINISHED"
-            }).then((response) => {
-                console.log(response);
-                window.location.reload() // TODO Lazy way to do this...
-            });
+            status: "FINISHED"
+        }).then((response) => {
+            console.log(response);
+            window.location.reload() // TODO Lazy way to do this...
+        });
     }
     const deleteTask = (id: number) => {
-        console.log("TASK " + id + " WILL BE DELETED!")
         axios.delete<TodoItem>("/api/notes/" + id).then((response) => {
-                console.log(response);
-                window.location.reload() // TODO Lazy way to do this...
-            });
+            console.log(response);
+            window.location.reload() // TODO Lazy way to do this...
+        });
     }
 
     return (
         <div>
-            <div>
+            <div className="tasklist" id="todo_tasks_unfinished">
             <h1 id="header_tasks_unfinished">TODO:</h1>
             {notes.map((note, i) => (
-                <div className="tasklist" id="todo_tasks_unfinished">
-                    <Button title="O" buttonOnClick={() => {markAsDone(note.id)}}/>
-                    <Button title="X" buttonOnClick={() => {deleteTask(note.id)}}/>
+                <div>
+                    <Button className='button_mark_done' buttonOnClick={() => {markAsDone(note.id)}}/>
+                    <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
                     {note.text}
                 </div>
             ))}
@@ -86,8 +96,9 @@ function TodoItemList() {
             <h1 id="header_tasks_finished">Finished tasks:</h1>
             {doneNotes.map((note, i) => (
                 <div>
-                    <Button title="X" buttonOnClick={() => {deleteTask(note.id)}}/>
-                    {note.text}
+                    <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
+                    <span className="task_finished_date">{formatDateTime(note.finishingTime)}</span>
+                    <span className="task_finished_task">{note.text}</span>
                 </div>
             ))}
             </div>
@@ -95,6 +106,28 @@ function TodoItemList() {
     );
 }
 
+/*
+ * Ugly dependencyless way to format date string to another date string.
+ */
+function formatDateTime(dateTime?: string | null): string {
+    if (dateTime) {
+        const date = new Date(dateTime)
+        return pad(date.getDate()) + "." 
+                + pad(date.getMonth()) + "." 
+                + pad(date.getFullYear()) + " " 
+                + pad(date.getHours()) + ":" 
+                + pad(date.getMinutes()) + ":" 
+                + pad(date.getSeconds())
+    }
+    return "Unknown"
+}
+
+/*
+ * Pad number to min 2 characters long.
+ */
+function pad(num: number): string {
+    return num.toString().padStart(2, "0")
+}
 
 /**
  * 
@@ -102,8 +135,8 @@ function TodoItemList() {
 export class TodoList extends React.Component {
     render() {
         return (
-            <div className="transaction-graph">
-            <h1>My TODO items</h1>
+            <div id="root">
+            <h1>My TODO list</h1>
             <NewTodoItem />
             <TodoItemList />
             </div>
