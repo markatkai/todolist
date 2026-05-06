@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+body {
+  background-color: rgb(253,228,242);
+}
+
 #root>h1 {
   font-size: 30px;
   font-weight: bold;
@@ -7,19 +11,27 @@
 }
 
 #todo_new_item {
+  margin: 5px;
+  border-radius: 12px;
+  background-color: rgb(230,139,190);
+
   input {
-    border-color: black;
+    border-color: rgb(230,139,190);
     border-style: solid;
     border-width: 1px;
+    border-radius: 12px;
     width: 50%;
     min-width: 400px;
     margin-left: 8px;
     padding: 2px;
+    background-color: rgb(249,206,231);
   }
   button {
     border-color: black;
     border-style: solid;
     border-width: 1px;
+    border-radius: 12px;
+    background-color:  rgb(249,206,231);
     margin: 5px;
     padding: 2px 10px;
   }
@@ -27,15 +39,16 @@
 
 .tasklist {
   margin: 5px;
-  border: 0.2rem outset black;
+  border: 0.2rem outset rgb(244,184,218);
+  border-radius: 12px;
 
   h1 {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
     padding-left: 8px;
   }
 
-  background-color: darkgray;
+  background-color: rgb(230,139,190);
   div {
     line-height: 40px;
     height: 45px;
@@ -47,7 +60,7 @@
     height: 30px;
     width: 30px;
 
-    border-color: black;
+    border-color: rgb(230,139,190);
     border-style: solid;
     border-width: 1px;
     border-radius: 12px;
@@ -61,24 +74,25 @@
 
     &.button_remove {
       background-image: url(/icons/delete-trash-svgrepo-com.svg);
-      background-color: pink;
+      background-color: rgb(238,161,205);
+      margin-right: 10px;
     }
     &.button_mark_done {
       background-image: url(/icons/like-svgrepo-com.svg);
-      background-color: pink;
+      background-color: rgb(238,161,205);
     }
   }
 
   &#todo_tasks_unfinished {
     div {
-      background-color: lightyellow;
+      background-color: rgb(249,206,231);
       border-radius: 12px;
     }
   }
 
   &#todo_tasks_finished {
     div {
-      background-color: lightgreen;
+      background-color: rgb(249,206,231);
       border-radius: 12px;
     }
 
