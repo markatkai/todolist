@@ -88,10 +88,11 @@ public class NoteController {
      */
     private NoteResponse noteToResponse(NoteDto noteDto) {
         return new NoteResponse(
-                noteDto.getCreateTime(),
-                noteDto.getText(),
-                NoteStatus.valueOf(noteDto.getStatus().name()),
-                noteDto.getFinishingTime()
+            noteDto.getId(),
+            noteDto.getCreateTime(),
+            noteDto.getText(),
+            NoteStatus.valueOf(noteDto.getStatus().name()),
+            noteDto.getFinishingTime()
         );
     }
 }
