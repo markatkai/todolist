@@ -11,52 +11,61 @@ import todo.api.NoteStatus;
 
 @Service
 public class NoteService {
-
+    
     private final NoteRepository repository;
 
     @Autowired
     public NoteService(NoteRepository repository) {
-        this.repository = repository;
+		this.repository = repository;
     }
 
     /**
-     * Delete a todo-note.
+     * Soft delete a todo-note: set the note's status as DELETED
      * @param id
      */
-    public void deleteById(Long id) {
-        repository.deleteById(id);
+    public void softDeleteById(Long id) {
+		NoteDto existing = repository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Note not found"));
+		NoteDto updated = new NoteDto(
+				existing.getId(),
+				existing.getCreateTime(),
+				Instant.now(),
+				existing.getText(),
+				NoteStatusDto.DELETED,
+				existing.getFinishingTime()
+		);
+		repository.save(updated);
     }
 
     /**
      * Update existing todo-note by id.
      * @param id
-     * @param text
      * @param status
      * @return
      */
-    public NoteDto updateByIId(Long id, String text, NoteStatus status) {
-        NoteDto existing = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Note not found"));
+    public NoteDto updateByIId(Long id, NoteStatus status) {
+		NoteDto existing = repository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Note not found"));
 
-        NoteStatusDto newStatus = status != null
-                ? NoteStatusDto.valueOf(status.name())
-                : existing.getStatus();
+		NoteStatusDto newStatus = status != null
+				? NoteStatusDto.valueOf(status.name())
+				: existing.getStatus();
 
-        Instant now = Instant.now();
-        Instant finishingTime = newStatus == NoteStatusDto.FINISHED && existing.getFinishingTime() == null
-                ? now
-                : existing.getFinishingTime();
+		Instant now = Instant.now();
+		Instant finishingTime = newStatus == NoteStatusDto.FINISHED && existing.getFinishingTime() == null
+				? now
+				: existing.getFinishingTime();
 
-        NoteDto updated = new NoteDto(
-                existing.getId(),
-                existing.getCreateTime(),
-                now,
-                text != null ? text : existing.getText(),
-                newStatus,
-                finishingTime
-        );
+		NoteDto updated = new NoteDto(
+				existing.getId(),
+				existing.getCreateTime(),
+				now,
+				existing.getText(),
+				newStatus,
+				finishingTime
+		);
 
-        return repository.save(updated);
+		return repository.save(updated);
     }
 
     /**
@@ -65,21 +74,30 @@ public class NoteService {
      * @return
      */
     public NoteDto create(String text) {
-        Instant now = Instant.now();
-        NoteDto note = new NoteDto(
-                null,
-                now,
-                now,
-                text,
-                NoteStatusDto.UNFINISHED,
-                null
-        );
+		Instant now = Instant.now();
+		NoteDto note = new NoteDto(
+				null,
+				now,
+				now,
+				text,
+				NoteStatusDto.UNFINISHED,
+				null
+		);
 
-        NoteDto saved = repository.save(note);
-        return saved;
+		NoteDto saved = repository.save(note);
+		return saved;
     }
 
-    public List<NoteDto> find(Instant timeStart, Instant timeEnd) {
-        return repository.findAll();
+    /**
+     * Find items.
+     * @param timeStart
+     * @param timeEnd
+     * @param status
+     * @return
+     */
+    public List<NoteDto> find(Instant timeStart, Instant timeEnd, NoteStatus status) {
+		return repository.findAll().stream() // TODO find directly from db with WHERE clause
+				.filter(note -> note.getStatus() == NoteStatusDto.valueOf(status.name())) 
+				.toList();
     }
 }

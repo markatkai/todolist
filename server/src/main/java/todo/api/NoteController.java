@@ -38,9 +38,11 @@ public class NoteController {
      */
     @GetMapping("/notes")
     List<NoteResponse> findNotes(@RequestParam(required = false) Instant timeStart, 
-        @RequestParam(required = false) Instant timeEnd) {
+            @RequestParam(required = false) Instant timeEnd,
+            @RequestParam(required = false) NoteStatus status
+        ) {
             logger.info("Attempting to find notes...");
-            return noteService.find(timeStart, timeEnd).stream()
+            return noteService.find(timeStart, timeEnd, status).stream()
                 .map(this::noteToResponse)
                 .toList();
     }
@@ -67,7 +69,7 @@ public class NoteController {
     NoteResponse updateNotes(@PathVariable Long id, 
         @RequestBody NoteUpdateRequest request) {
         logger.info("Attempting to update notes... {}", request);
-        var updated = noteService.updateByIId(id, request.text(), request.status());
+        var updated = noteService.updateByIId(id, request.status());
         return noteToResponse(updated);
     }
 
@@ -78,7 +80,7 @@ public class NoteController {
     @DeleteMapping("/notes/{id}")
     void deleteNote(@PathVariable Long id) {
         logger.info("Attempting to delete note with id... {}", id);
-        noteService.deleteById(id);
+        noteService.softDeleteById(id);
     }
 
     /**
