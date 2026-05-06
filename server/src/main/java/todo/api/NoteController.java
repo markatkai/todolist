@@ -3,6 +3,8 @@ package todo.api;
 import java.time.Instant;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import todo.data.NoteDto;
 import todo.data.NoteService;
 
 @RestController
 public class NoteController {
+
+    Logger logger = LoggerFactory.getLogger(NoteController.class);
 
     private NoteService noteService;
 
@@ -32,10 +37,12 @@ public class NoteController {
      * @return
      */
     @GetMapping("/notes")
-    List<NoteResponse> findNotes(@RequestParam Instant timeStart, 
-        @RequestParam Instant timeEnd) {
-        // TODO
-        return null;
+    List<NoteResponse> findNotes(@RequestParam(required = false) Instant timeStart, 
+        @RequestParam(required = false) Instant timeEnd) {
+            logger.info("Attempting to find notes...");
+            return noteService.find(timeStart, timeEnd).stream()
+                .map(this::noteToResponse)
+                .toList();
     }
 
     /**
@@ -45,7 +52,9 @@ public class NoteController {
      */
     @PostMapping("/notes")
     NoteResponse createNotes(@RequestBody NoteCreateRequest request) {
-        return noteService.create(request.text());
+        logger.info("Attempting to create notes... {}", request);
+        var created = noteService.create(request.text());
+        return noteToResponse(created);
     }
 
     /**
@@ -57,7 +66,9 @@ public class NoteController {
     @PutMapping("/notes/{id}")
     NoteResponse updateNotes(@PathVariable Long id, 
         @RequestBody NoteUpdateRequest request) {
-        return noteService.updateByIId(id, request.text(), request.status());
+        logger.info("Attempting to update notes... {}", request);
+        var updated = noteService.updateByIId(id, request.text(), request.status());
+        return noteToResponse(updated);
     }
 
     /**
@@ -66,6 +77,21 @@ public class NoteController {
      */
     @DeleteMapping("/notes/{id}")
     void deleteNote(@PathVariable Long id) {
+        logger.info("Attempting to delete note with id... {}", id);
         noteService.deleteById(id);
+    }
+
+    /**
+     * Helper for converting internal presentation to api presentation.
+     * @param noteDto
+     * @return
+     */
+    private NoteResponse noteToResponse(NoteDto noteDto) {
+        return new NoteResponse(
+                noteDto.getCreateTime(),
+                noteDto.getText(),
+                NoteStatus.valueOf(noteDto.getStatus().name()),
+                noteDto.getFinishingTime()
+        );
     }
 }

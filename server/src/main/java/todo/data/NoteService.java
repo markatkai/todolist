@@ -1,12 +1,12 @@
 package todo.data;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
-import todo.api.NoteResponse;
 import todo.api.NoteStatus;
 
 @Service
@@ -34,35 +34,29 @@ public class NoteService {
      * @param status
      * @return
      */
-    public NoteResponse updateByIId(Long id, String text, NoteStatus status) {
+    public NoteDto updateByIId(Long id, String text, NoteStatus status) {
         NoteDto existing = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Note not found"));
 
         NoteStatusDto newStatus = status != null
                 ? NoteStatusDto.valueOf(status.name())
-                : existing.status();
+                : existing.getStatus();
 
         Instant now = Instant.now();
-        Instant finishingTime = newStatus == NoteStatusDto.FINISHED && existing.finishingTime() == null
+        Instant finishingTime = newStatus == NoteStatusDto.FINISHED && existing.getFinishingTime() == null
                 ? now
-                : existing.finishingTime();
+                : existing.getFinishingTime();
 
         NoteDto updated = new NoteDto(
-                existing.id(),
-                existing.createTime(),
+                existing.getId(),
+                existing.getCreateTime(),
                 now,
-                text != null ? text : existing.text(),
+                text != null ? text : existing.getText(),
                 newStatus,
                 finishingTime
         );
 
-        NoteDto saved = repository.save(updated);
-        return new NoteResponse(
-                saved.createTime(),
-                saved.text(),
-                NoteStatus.valueOf(saved.status().name()),
-                saved.finishingTime()
-        );
+        return repository.save(updated);
     }
 
     /**
@@ -70,7 +64,7 @@ public class NoteService {
      * @param text
      * @return
      */
-    public NoteResponse create(String text) {
+    public NoteDto create(String text) {
         Instant now = Instant.now();
         NoteDto note = new NoteDto(
                 null,
@@ -82,13 +76,10 @@ public class NoteService {
         );
 
         NoteDto saved = repository.save(note);
-        return new NoteResponse(
-                saved.createTime(),
-                saved.text(),
-                NoteStatus.valueOf(saved.status().name()),
-                saved.finishingTime()
-        );
+        return saved;
     }
 
-
+    public List<NoteDto> find(Instant timeStart, Instant timeEnd) {
+        return repository.findAll();
+    }
 }
