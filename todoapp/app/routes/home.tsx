@@ -3,8 +3,8 @@ import { TodoList } from "../todoapp/TodoList";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "TODO App" },
+    { name: "description", content: "Application for tracking TODO items" },
   ];
 }
 
