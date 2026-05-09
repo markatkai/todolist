@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:postgresql://${TODO_DB_HOST:localhost}:${TODO_DB_PORT:5432}/todo
+    username: ${TODO_DB_USER}
+    password: ${TODO_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    locations: db/migration
+
+logging:
+  level:
+    root: info
+
+server:
+  port : 8080
