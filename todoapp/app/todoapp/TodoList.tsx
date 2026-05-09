@@ -14,22 +14,20 @@ function NewTodoItem() {
         setText(event.currentTarget.value)
     }
 
-    const sendPostRequest = (text: string) => {
-        axios.post<TodoItem>("/api/notes", {
-            text: text
-        }).then(() => {
-            setText("")
-            window.location.reload() // TODO Lazy way to do this...
-        });
-    }
-
-    const createTodo = () => {
-        if (text) {
-            // Create a new todo item
-            sendPostRequest(text)
+    const sendPostRequest = (textToSend: string) => {
+        if (textToSend) {
+            axios.post<TodoItem>("/api/notes", {
+                text: textToSend
+            }).then(() => {
+                setText("")
+                window.location.reload() // TODO Lazy way to do this...
+            });
         }
     }
 
+    /**
+     * Catch Enter pressing in the input.
+     */
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             sendPostRequest(text)
@@ -39,7 +37,7 @@ function NewTodoItem() {
     return (
         <div id='todo_new_item'>
             <input onChange={printText} onKeyDown={handleKeyDown} maxLength={120} />
-            <Button title="Add" buttonOnClick={createTodo} />
+            <Button title="Add" buttonOnClick={() => sendPostRequest(text)} />
         </div>
     );
 }
@@ -63,14 +61,13 @@ function TodoItemList() {
     const markAsDone = (id: number) => {
         axios.put<TodoItem>("/api/notes/" + id, {
             status: "FINISHED"
-        }).then((response) => {
-            console.log(response);
+        }).then(() => {
             window.location.reload() // TODO Lazy way to do this...
         });
     }
     const deleteTask = (id: number) => {
-        axios.delete<TodoItem>("/api/notes/" + id).then((response) => {
-            console.log(response);
+        axios.delete<TodoItem>("/api/notes/" + id)
+        .then(() => {
             window.location.reload() // TODO Lazy way to do this...
         });
     }
@@ -79,8 +76,8 @@ function TodoItemList() {
         <div>
             <div className="tasklist" id="todo_tasks_unfinished">
             <h1 id="header_tasks_unfinished">TODO:</h1>
-            {notes.map((note, i) => (
-                <div className="todo_list_row">
+            {notes.map((note) => (
+                <div className="todo_list_row" key={note.id} >
                     <div className="todo_task_buttons">
                         <Button className='button_mark_done' buttonOnClick={() => {markAsDone(note.id)}}/>
                         <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
@@ -91,7 +88,7 @@ function TodoItemList() {
             </div>
             <div className="tasklist" id="todo_tasks_finished">
             <h1 id="header_tasks_finished">Finished tasks:</h1>
-            {doneNotes.map((note, i) => (
+            {doneNotes.map((note) => (
                 <div className="todo_list_row" key={note.id} >
                     <div className="todo_task_buttons">
                         <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
