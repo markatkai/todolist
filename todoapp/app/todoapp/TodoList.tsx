@@ -32,9 +32,7 @@ function NewTodoItem() {
 
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-            if (text) {
-                sendPostRequest(text)
-            }
+            sendPostRequest(text)
         }
     }
 
@@ -94,7 +92,7 @@ function TodoItemList() {
             <div className="tasklist" id="todo_tasks_finished">
             <h1 id="header_tasks_finished">Finished tasks:</h1>
             {doneNotes.map((note, i) => (
-                <div className="todo_list_row">
+                <div className="todo_list_row" key={note.id} >
                     <div className="todo_task_buttons">
                         <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
                     </div>
@@ -116,7 +114,7 @@ function formatDateTime(dateTime?: string | null): string {
     if (dateTime) {
         const date = new Date(dateTime)
         return pad(date.getDate()) + "." 
-                + pad(date.getMonth()) + "." 
+                + pad(date.getMonth() + 1) + "."  // Month starts from 0
                 + pad(date.getFullYear()) + " " 
                 + pad(date.getHours()) + ":" 
                 + pad(date.getMinutes()) + ":" 

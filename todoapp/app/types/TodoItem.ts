@@ -1,4 +1,3 @@
-// 
 export type TodoItem = {
     id: number
     createTime: string
