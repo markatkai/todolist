@@ -1,3 +1,5 @@
+name: todoapp
+
 services:
   tododb:
     container_name: tododb
