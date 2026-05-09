@@ -56,7 +56,7 @@ body {
     margin: 3px;
 
     .todo_task_buttons {
-      float:left;
+      float: left;
     }
     .todo_task {
       text-wrap: wrap;
@@ -107,12 +107,18 @@ body {
       border-radius: 12px;
     }
 
-    span {
+    div {
       margin: 3px;
 
       &.task_finished_date {
-        display: inline-block;
-        width: 190px;
+        width: 180px;
+        float: left;
+      }
+      &.task_finished_text {
+        text-wrap: wrap;
+        overflow: visible;
+        vertical-align: middle;
+        overflow-wrap: break-word;
       }
     }
   }
