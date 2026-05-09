@@ -142,7 +142,7 @@ export class TodoList extends React.Component {
     render() {
         return (
             <div id="root">
-            <h1>My TODO list</h1>
+            <h1>TODO list</h1>
             <NewTodoItem />
             <TodoItemList />
             </div>
