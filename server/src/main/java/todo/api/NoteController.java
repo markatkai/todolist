@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import todo.data.NoteDto;
 import todo.data.NoteService;
 
+@Validated
 @RestController
 public class NoteController {
 
@@ -53,7 +56,7 @@ public class NoteController {
      * @return
      */
     @PostMapping("/notes")
-    NoteResponse createNotes(@RequestBody NoteCreateRequest request) {
+    NoteResponse createNotes(@Valid @RequestBody NoteCreateRequest request) {
         logger.info("Attempting to create notes... {}", request);
         var created = noteService.create(request.text());
         return noteToResponse(created);
@@ -67,7 +70,7 @@ public class NoteController {
      */
     @PutMapping("/notes/{id}")
     NoteResponse updateNotes(@PathVariable Long id, 
-        @RequestBody NoteUpdateRequest request) {
+        @Valid @RequestBody NoteUpdateRequest request) {
         logger.info("Attempting to update notes... {}", request);
         var updated = noteService.updateByIId(id, request.status());
         return noteToResponse(updated);

@@ -1,7 +1,7 @@
 package todo.api;
 
-public record NoteUpdateRequest(
-    NoteStatus status
-) {
+import jakarta.validation.constraints.NotNull;
 
-}
+public record NoteUpdateRequest(
+    @NotNull NoteStatus status
+) {}
