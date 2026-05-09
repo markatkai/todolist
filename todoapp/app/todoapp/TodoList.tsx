@@ -85,20 +85,26 @@ function TodoItemList() {
             <div className="tasklist" id="todo_tasks_unfinished">
             <h1 id="header_tasks_unfinished">TODO:</h1>
             {notes.map((note, i) => (
-                <div>
-                    <Button className='button_mark_done' buttonOnClick={() => {markAsDone(note.id)}}/>
-                    <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
-                    {note.text}
+                <div className="todo_list_row">
+                    <div className="todo_task_buttons">
+                        <Button className='button_mark_done' buttonOnClick={() => {markAsDone(note.id)}}/>
+                        <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
+                    </div>
+                    <div className="todo_task">{note.text}</div>
                 </div>
             ))}
             </div>
             <div className="tasklist" id="todo_tasks_finished">
             <h1 id="header_tasks_finished">Finished tasks:</h1>
             {doneNotes.map((note, i) => (
-                <div>
-                    <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
-                    <span className="task_finished_date">{formatDateTime(note.finishingTime)}</span>
-                    <span className="task_finished_task">{note.text}</span>
+                <div className="todo_list_row">
+                    <div className="todo_task_buttons">
+                        <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
+                    </div>
+                    <div className="todo_task">
+                        <span className="task_finished_date">{formatDateTime(note.finishingTime)}</span>
+                        {note.text}
+                    </div>
                 </div>
             ))}
             </div>
