@@ -94,8 +94,8 @@ function TodoItemList() {
                         <Button className='button_remove' buttonOnClick={() => {deleteTask(note.id)}}/>
                     </div>
                     <div className="todo_task">
-                        <span className="task_finished_date">{formatDateTime(note.finishingTime)}</span>
-                        {note.text}
+                        <div className="task_finished_date">{formatDateTime(note.finishingTime)}</div>
+                        <div className="task_finished_text">{note.text}</div>
                     </div>
                 </div>
             ))}
