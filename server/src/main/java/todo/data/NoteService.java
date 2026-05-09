@@ -1,17 +1,24 @@
 package todo.data;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.NotNull;
 import todo.api.NoteStatus;
+import todo.api.ApiOrder;
 
 @Service
 public class NoteService {
-    
+
+	public static final List<String> ALLOWED_ORDER_CRITERIA = List.of("createTime", "finishingTime", "status");
+
     private final NoteRepository repository;
 
     @Autowired
@@ -21,17 +28,21 @@ public class NoteService {
 
     /**
      * Soft delete a todo-note: set the note's status as DELETED
-     * @param id
+     * @param id Identifier of the note to set as deleted
      */
     public void softDeleteById(Long id) {
-		NoteDto existing = repository.findById(id)
+		var existing = repository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Note not found"));
-		NoteDto updated = new NoteDto(
+		if (existing.getStatus() == Status.DELETED) {
+			// Let's pretend that the note does not exist if it is DELETED
+			throw new EntityNotFoundException("Note not found");
+		} 
+		var updated = new Note(
 				existing.getId(),
 				existing.getCreateTime(),
 				Instant.now(),
 				existing.getText(),
-				NoteStatusDto.DELETED,
+				Status.DELETED,
 				existing.getFinishingTime()
 		);
 		repository.save(updated);
@@ -39,29 +50,30 @@ public class NoteService {
 
     /**
      * Update existing todo-note by id.
-     * @param id
-     * @param status
-     * @return
+     * @param id Identifier of the note that should be updated
+     * @param status new status for the task
+     * @return Updated task item
      */
-    public NoteDto updateByIId(Long id, NoteStatus status) {
-		NoteDto existing = repository.findById(id)
+    public Note updateById(Long id, @NotNull NoteStatus newStatus) {
+		var existing = repository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException("Note not found"));
 
-		NoteStatusDto newStatus = status != null
-				? NoteStatusDto.valueOf(status.name())
-				: existing.getStatus();
-
-		Instant now = Instant.now();
-		Instant finishingTime = newStatus == NoteStatusDto.FINISHED && existing.getFinishingTime() == null
+		var now = Instant.now();
+		var finishingTime = newStatus == NoteStatus.FINISHED && existing.getFinishingTime() == null
 				? now
 				: existing.getFinishingTime();
 
-		NoteDto updated = new NoteDto(
+		if (existing.getStatus() == Status.DELETED) {
+			// Let's pretend that the note does not exist if it is DELETED
+			throw new EntityNotFoundException("Note not found");
+		} 
+
+		var updated = new Note(
 				existing.getId(),
 				existing.getCreateTime(),
 				now,
 				existing.getText(),
-				newStatus,
+				Status.valueOf(newStatus.name()),
 				finishingTime
 		);
 
@@ -70,34 +82,51 @@ public class NoteService {
 
     /**
      * Create a new todo-note.
-     * @param text
-     * @return
+     * @param text text for the new todo task
+     * @return full presentation of the newly created task
      */
-    public NoteDto create(String text) {
-		Instant now = Instant.now();
-		NoteDto note = new NoteDto(
+    public Note create(String text) {
+		var now = Instant.now();
+		var note = new Note(
 				null,
 				now,
 				now,
 				text,
-				NoteStatusDto.UNFINISHED,
+				Status.UNFINISHED,
 				null
 		);
 
-		NoteDto saved = repository.save(note);
-		return saved;
+		return repository.save(note);
     }
 
     /**
-     * Find items.
-     * @param timeStart
-     * @param timeEnd
-     * @param status
-     * @return
+     * Find items by potential search criteria, and potentially sort by the given value and order.
+     * @param timeStart Inclusive start time for finding tasks created earliest at this date time
+     * @param timeEnd Exclusive end time for finding tasks created before this date time
+     * @param status Status of the notes to search for
+     * @param orderBy Order results by the given value
+     * @param order Select if the results should be ordered ASC or DESC. Default is ASC. Only applies if orderBy is given
+     * @return The list of 
      */
-    public List<NoteDto> find(Instant timeStart, Instant timeEnd, NoteStatus status) {
-		return repository.findAll().stream() // TODO find directly from db with WHERE clause
-				.filter(note -> note.getStatus() == NoteStatusDto.valueOf(status.name())) 
-				.toList();
+    public List<Note> findNonDeletedNotes(Instant timeStart, Instant timeEnd, NoteStatus status, String orderBy, ApiOrder order) {
+		var searchCriteriaList = new ArrayList<Specification<Note>>();
+		if (timeStart != null) {
+			searchCriteriaList.add((root, q, cb) -> cb.greaterThanOrEqualTo(root.get("createTime"), timeStart));
+		}
+		if (timeEnd != null) {
+			searchCriteriaList.add((root, q, cb) -> cb.lessThan(root.get("createTime"), timeEnd));
+		}
+		if (status != null) {
+			searchCriteriaList.add((root, q, cb) -> cb.equal(root.get("status"), Status.valueOf(status.name())));
+		} else {
+			// If not finding by 
+			searchCriteriaList.add((root, q, cb) -> cb.notEqual(root.get("status"), Status.DELETED.name()));
+		}
+
+		Specification<Note> searchCriteria = Specification.allOf(searchCriteriaList);
+		Sort sort = orderBy == null ? Sort.unsorted()
+			: Sort.by(order == ApiOrder.DESC ? Sort.Direction.DESC : Sort.Direction.ASC, orderBy);
+
+		return repository.findAll(searchCriteria, sort);
     }
 }

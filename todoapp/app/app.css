@@ -13,6 +13,11 @@ body {
   border-radius: 12px;
   background-color: rgb(230,139,190);
 
+  div {
+    margin-left: 5px;
+    padding: 5px;
+  }
+
   input {
     border-color: rgb(230,139,190);
     border-style: solid;
@@ -21,7 +26,8 @@ body {
     width: 50%;
     min-width: 350px;
     margin-left: 8px;
-    padding: 2px;
+    padding: 5px;
+    margin: 5px;
     background-color: rgb(249,206,231);
   }
   button {
@@ -35,10 +41,20 @@ body {
   }
 }
 
+.error {
+  padding: 10px;
+  border-color: red;
+  border-style: dashed;
+  border-radius: 12px;
+  margin: 5px;
+  background-color: rgb(249,206,231);
+}
+
 .tasklist {
   margin: 5px;
   border: 0.2rem outset rgb(244,184,218);
   border-radius: 12px;
+  background-color: rgb(230,139,190);
 
   h1 {
     font-size: 24px;
@@ -46,8 +62,10 @@ body {
     padding-left: 8px;
   }
 
-  background-color: rgb(230,139,190);
   div {
+    background-color: rgb(249,206,231);
+    border-radius: 12px;
+
     &.todo_list_row {
       min-height: 50px;
     }
@@ -91,35 +109,6 @@ body {
     &.button_mark_done {
       background-image: url(/icons/like-svgrepo-com.svg);
       background-color: rgb(238,161,205);
-    }
-  }
-
-  &#todo_tasks_unfinished {
-    div {
-      background-color: rgb(249,206,231);
-      border-radius: 12px;
-    }
-  }
-
-  &#todo_tasks_finished {
-    div {
-      background-color: rgb(249,206,231);
-      border-radius: 12px;
-    }
-
-    div {
-      margin: 3px;
-
-      &.task_finished_date {
-        width: 180px;
-        float: left;
-      }
-      &.task_finished_text {
-        text-wrap: wrap;
-        overflow: visible;
-        vertical-align: middle;
-        overflow-wrap: break-word;
-      }
     }
   }
 }
