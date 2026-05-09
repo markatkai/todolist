@@ -11,15 +11,13 @@ function NewTodoItem() {
     const [text, setText] = useState("");
 
     const printText = (event: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(event.currentTarget.value);
         setText(event.currentTarget.value)
     }
 
     const sendPostRequest = (text: string) => {
         axios.post<TodoItem>("/api/notes", {
             text: text
-        }).then((response) => {
-            console.log(response);
+        }).then(() => {
             setText("")
             window.location.reload() // TODO Lazy way to do this...
         });
@@ -27,7 +25,6 @@ function NewTodoItem() {
 
     const createTodo = () => {
         if (text) {
-            console.log("And it is ok to try to send it")
             // Create a new todo item
             sendPostRequest(text)
         }
@@ -43,7 +40,7 @@ function NewTodoItem() {
 
     return (
         <div id='todo_new_item'>
-            <input onChange={printText} onKeyDown={handleKeyDown} />
+            <input onChange={printText} onKeyDown={handleKeyDown} maxLength={120} />
             <Button title="Add" buttonOnClick={createTodo} />
         </div>
     );

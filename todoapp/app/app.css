@@ -62,6 +62,7 @@ body {
       text-wrap: wrap;
       overflow: visible;
       vertical-align: middle;
+      overflow-wrap: break-word;
       line-height: 24px;
     }
   }
