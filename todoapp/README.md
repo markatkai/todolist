@@ -35,7 +35,8 @@ Dockerfile of this front thus only builds the app and actually runs nginx for th
 ## Icons
 
 Icons for "mark as done" and "trash" and the favicon.ico were found from svgrepo:
+
 Vectors and icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a>
-Exact collection:
-https://www.svgrepo.com/collection/web-9/
+
+Exact collection: https://www.svgrepo.com/collection/web-9/
 

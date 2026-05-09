@@ -35,8 +35,7 @@ If one wants to simply run it all:
 docker compose -f docker-compose-pg.yaml -f docker-compose-app.yaml up
 ```
 
-After code changes, remember to rebuild the containers
-If one wants to simply run it all:
+After code changes, remember to rebuild the containers:
 ```bash
 docker compose -f docker-compose-pg.yaml -f docker-compose-app.yaml up --build
 ```
