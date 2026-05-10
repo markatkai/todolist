@@ -4,6 +4,57 @@ The endpoints are not secured (HTTPS) and there is no authentication to them. Th
 
 ## APIs
 
+### GET /notes
+
+Find non deleted notes.
+The following optional query parameters exist for the endpoint:
+- timeStart - find notes created at timeStart or later. Format is ISO 8601 format
+- timeEnd - find notes created before timeEnd. Format is ISO 8601 format
+- status - find notes with the exact status. The accepted statuses are FINISHED or UNFINISHED
+- orderBy - order the result by the given value. The accepted values are createTime, finishingTime or status
+- order - if orderBy is given, order the values in ascending or descending order. The accepted values are ASC and DESC
+
+### POST /notes
+
+Create a new note. The format for the request body is e.g.
+```json
+{
+    "text":"the text for the note"
+}
+```
+Returns full data for the new note. The response body is e.g.
+```json
+{
+    "id": 23,
+    "createTime": "2026-05-10T17:40:02.517909233Z",
+    "text": "the text for the note",
+    "status": "UNFINISHED",
+    "finishingTime": null
+}
+```
+
+### PUT /notes/{id}
+
+Update the status of a note. The format for the request body is e.g.
+```json
+{
+    "status":"FINISHED"
+}
+```
+Returns full updated data for the updated note. The response body is e.g.
+```json
+{
+    "id": 23,
+    "createTime": "2026-05-10T17:40:02.517909233Z",
+    "text": "the text for the note",
+    "status": "FINISHED",
+    "finishingTime": "2026-05-10T17:42:02.517909233Z"
+}
+```
+
+### DELETE /notes/{id}
+
+Mark the given value as deleted.
 
 ## Development
 
