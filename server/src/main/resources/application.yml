@@ -1,7 +1,4 @@
 spring:
-  config:
-    activate:
-      on-profile: test
   datasource:
     url: jdbc:postgresql://${TODO_DB_HOST:localhost}:${TODO_DB_PORT:5432}/todo
     username: ${TODO_DB_USER}
@@ -21,3 +18,4 @@ logging:
 
 server:
   port : 8080
+

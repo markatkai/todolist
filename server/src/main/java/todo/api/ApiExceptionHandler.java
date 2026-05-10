@@ -3,22 +3,39 @@ package todo.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.persistence.EntityNotFoundException;
+import todo.exception.InvalidRequestCriteriaException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    Logger logger = LoggerFactory.getLogger(NoteController.class);
+    Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    ErrorResponse entiErrorResponse(EntityNotFoundException ex) {
+    ErrorResponse entityErrorResponse(EntityNotFoundException ex) {
         logger.error("Entity not found");
         return new ErrorResponse("Not found");
+    }
+
+    @ExceptionHandler(InvalidRequestCriteriaException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ErrorResponse invalidSortValue(InvalidRequestCriteriaException ex) {
+        logger.error("Invalid orderBy value {}", ex.getErrorDescription());
+        return new ErrorResponse(ex.getErrorDescription());
+    }
+
+    /* Request validation fails */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    ErrorResponse methodArgumentNotValid(MethodArgumentNotValidException ex) {
+        logger.error("Invalid request", ex);
+        return new ErrorResponse("Invalid request body");
     }
 
     @ExceptionHandler(RuntimeException.class)

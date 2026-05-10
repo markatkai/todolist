@@ -3,28 +3,31 @@ package todo.data;
 import java.time.Instant;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class NoteDto {
+public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Instant createTime;
     private Instant updateTime;
     private String text;
-    private NoteStatusDto status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     private Instant finishingTime;
 
-    public NoteDto() {}
+    public Note() {}
 
-    public NoteDto(Long id,
+    public Note(Long id,
         Instant createTime,
         Instant updateTime,
         String text,
-        NoteStatusDto status,
+        Status status,
         Instant finishingTime
     ) {
         this.id = id;
@@ -51,7 +54,7 @@ public class NoteDto {
         return text;
     }
 
-    public NoteStatusDto getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -75,7 +78,7 @@ public class NoteDto {
         this.text = text;
     }
 
-    public void setStatus(NoteStatusDto status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

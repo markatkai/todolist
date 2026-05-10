@@ -1,6 +1,6 @@
 package todo.data;
 
-public enum NoteStatusDto {
+public enum Status {
     UNFINISHED,
     FINISHED,
     DELETED
