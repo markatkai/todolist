@@ -14,6 +14,12 @@ Note, because this is a simple app, the endpoints are unauthenticated and use un
 
 Folder named docker contains two docker compose files for easy running of the system.
 
+At least the following technologies are needed for building and running the stack:
+- Docker with docker compose 
+- Node >=22
+- JDK-25
+- Maven
+
 ### docker/docker-compose-pg.yaml
 Docker compose file for running a Postgresql 18.3 server. Default PostgreSQK port 5432 is exposed. The service name is tododb.
 
